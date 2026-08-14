@@ -1,0 +1,233 @@
+/**
+ * Sales by State inside WooCommerce Analytics.
+ *
+ * Analytics supplies the cards, tables and summaries. This file covers only the
+ * filter row above them and two corrections to components that assume a
+ * comparison period this report does not have.
+ *
+ * @package SalesByStateReportForWooCommerce
+ */
+
+.sbsr-filters {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 16px;
+	margin: 0 0 16px;
+}
+
+.sbsr-filter {
+	display: flex;
+	flex-direction: column;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.sbsr-filter__label {
+	line-height: 1.4;
+	margin-bottom: 4px;
+}
+
+/* The status control is a button because it holds checkboxes, the other two are
+   selects. They are declared together so the row cannot drift apart when the
+   surrounding stylesheet changes what a select looks like. */
+.sbsr-filter__select,
+.sbsr-filter__toggle.components-button {
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	min-width: 200px;
+	width: 100%;
+	height: 40px;
+	margin: 0;
+	padding: 0 12px;
+	border: 1px solid #949494;
+	border-radius: 2px;
+	background-color: #fff;
+	color: #2c3338;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1;
+	text-transform: none;
+	box-shadow: none;
+}
+
+.sbsr-filter__select {
+	/* Leave room for the chevron the browser draws. */
+	padding-right: 28px;
+}
+
+/* The same chevron WordPress draws on a select, so the two controls do not
+   advertise that one of them is really a button. */
+.sbsr-filter__toggle.components-button {
+	justify-content: flex-start;
+	padding-right: 28px;
+	background-image: url( 'data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E' );
+	background-repeat: no-repeat;
+	background-position: right 8px top 55%;
+	background-size: 16px 16px;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.sbsr-filter__toggle.components-button:hover {
+	color: #2c3338;
+	background-color: #fff;
+	border-color: #949494;
+}
+
+.sbsr-filter__select:focus,
+.sbsr-filter__toggle.components-button:focus:not(:disabled) {
+	border-color: #3582c4;
+	box-shadow: 0 0 0 1px #3582c4;
+	outline: 2px solid transparent;
+}
+
+.sbsr-status-popover__list {
+	min-width: 240px;
+	max-height: 320px;
+	overflow-y: auto;
+	padding: 12px 16px;
+}
+
+.sbsr-status-popover__list .components-checkbox-control {
+	margin-bottom: 8px;
+}
+
+.sbsr-status-popover__list .components-checkbox-control:last-child {
+	margin-bottom: 0;
+}
+
+/* SummaryNumber assumes a previous period and prints "Previous Year: N/A" when
+   it has none. This report covers a single year with nothing to compare it to,
+   so the comparison row is removed rather than filled with a placeholder. */
+.sbsr-report .woocommerce-summary__item-prev-label,
+.sbsr-report .woocommerce-summary__item-prev-value,
+.sbsr-report .woocommerce-summary__item-delta {
+	display: none !important;
+}
+
+.sbsr-report .woocommerce-summary__item-data {
+	margin-bottom: 0;
+}
+
+.sbsr-report .sbsr-error {
+	margin: 0 0 16px;
+	padding: 12px;
+}
+
+@media screen and (max-width: 782px) {
+	.sbsr-filters {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.sbsr-filter,
+	.sbsr-filter .components-select-control__input,
+	.sbsr-filter .components-button {
+		min-width: 0;
+		width: 100%;
+	}
+}
+
+/* ------------------------------------------------------------------
+ * Standalone page frame.
+ *
+ * WooCommerce Admin wraps its reports in a header bar and a wider gutter. The
+ * standalone page gets neither, so both are reproduced here — otherwise the
+ * same report sits in a visibly different frame depending on a setting the
+ * reader did not change.
+ * --------------------------------------------------------------- */
+
+.sbsr-wrap {
+	margin: 0;
+	padding: 0 36px 40px 18px;
+}
+
+.sbsr-page-header {
+	display: flex;
+	align-items: center;
+	min-height: 60px;
+	/* Pulled out to the window edges, the way the Analytics header sits. */
+	margin: 0 -36px 0 -18px;
+	padding: 0 36px 0 18px;
+	border-bottom: 1px solid #dcdcde;
+	background: #f0f0f1;
+}
+
+.sbsr-page-header__title {
+	margin: 0;
+	padding: 0;
+	color: #1e1e1e;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 1.4;
+}
+
+.sbsr-wrap #sbsr-root {
+	padding-top: 32px;
+}
+
+/* ------------------------------------------------------------------
+ * Import status
+ * --------------------------------------------------------------- */
+
+.sbsr-importing,
+.sbsr-notice {
+	padding: 14px 20px;
+	margin: 0 0 20px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.sbsr-notice.is-error {
+	border-left: 4px solid #d63638;
+}
+
+.sbsr-notice__title,
+.sbsr-importing__label {
+	font-weight: 600;
+}
+
+.sbsr-notice p {
+	margin: 0 0 8px;
+}
+
+.sbsr-notice p:last-child {
+	margin-bottom: 0;
+}
+
+.sbsr-importing__row {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.sbsr-importing__count {
+	color: #757575;
+	font-variant-numeric: tabular-nums;
+}
+
+.sbsr-importing__hint {
+	margin: 8px 0 0;
+	color: #757575;
+}
+
+.sbsr-progress {
+	height: 4px;
+	margin: 10px 0 0;
+	border-radius: 2px;
+	background: #f0f0f1;
+	overflow: hidden;
+}
+
+.sbsr-progress__bar {
+	height: 100%;
+	background: #3858e9;
+	transition: width .3s ease;
+}

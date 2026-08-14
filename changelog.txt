@@ -1,0 +1,4 @@
+*** Sales by State Report for WooCommerce Changelog ***
+
+2026-08-14 - version 1.0.0
+* Initial release.
