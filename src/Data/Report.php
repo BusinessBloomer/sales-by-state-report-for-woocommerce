@@ -189,8 +189,8 @@ class Report {
 				: ( '' === $code ? __( 'Unknown', 'sales-by-state-report-for-woocommerce' ) : $code );
 
 			foreach ( Filters::measure_keys() as $key ) {
-				$amount                            = round( (float) $row[ $key ], 2 );
-				$rows[ $index ][ $key ]            = $amount;
+				$amount                                = round( (float) $row[ $key ], 2 );
+				$rows[ $index ][ $key ]                = $amount;
 				$rows[ $index ][ $key . '_formatted' ] = $this->money( $amount );
 			}
 		}
@@ -214,8 +214,8 @@ class Report {
 				$sum += (float) $row[ $key ];
 			}
 
-			$totals[ $key ]                  = round( $sum, 2 );
-			$totals[ $key . '_formatted' ]   = $this->money( $totals[ $key ] );
+			$totals[ $key ]                = round( $sum, 2 );
+			$totals[ $key . '_formatted' ] = $this->money( $totals[ $key ] );
 		}
 
 		return $totals;
