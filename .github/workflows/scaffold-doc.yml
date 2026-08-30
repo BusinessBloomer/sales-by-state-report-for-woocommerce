@@ -1,0 +1,46 @@
+name: Scaffold doc from issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  scaffold:
+    if: contains(github.event.issue.labels.*.name, 'documentation')
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scaffold the doc file
+        id: scaffold
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: node .github/scripts/scaffold-doc.mjs
+
+      - name: Open a PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          SLUG: ${{ steps.scaffold.outputs.slug }}
+          FILENAME: ${{ steps.scaffold.outputs.filename }}
+          TITLE: ${{ steps.scaffold.outputs.title }}
+        run: |
+          BRANCH="doc/issue-${ISSUE_NUMBER}-${SLUG}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add docs/
+          git commit -m "Add doc: ${TITLE}"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "Add doc: ${TITLE}" \
+            --body "Scaffolded from #${ISSUE_NUMBER}. Review the content, then merge - it'll sync to WordPress as a draft. Closes #${ISSUE_NUMBER}." \
+            --base master \
+            --head "$BRANCH"

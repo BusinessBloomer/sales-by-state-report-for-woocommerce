@@ -1,0 +1,26 @@
+name: New documentation page
+description: Draft a new doc page for salesbystate.com/docs
+title: "Doc: "
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This opens a PR that adds a new page under `docs/` in the same format as the existing ones. Once merged, it syncs to WordPress as a draft for review before publishing.
+
+        Write the content below: short paragraphs, `##` for each section. To include a screenshot, drag an image onto its own line where you want it to appear.
+  - type: textarea
+    id: content
+    attributes:
+      label: Doc content
+      description: Markdown - short paragraphs, ## for each heading, drag in an image where a screenshot should go
+      placeholder: |
+        ## Section heading
+
+        A short paragraph explaining this part.
+
+        ## Another section
+
+        More plain-English explanation, no jargon.
+    validations:
+      required: true
