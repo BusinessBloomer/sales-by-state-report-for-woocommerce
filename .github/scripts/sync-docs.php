@@ -101,12 +101,14 @@ foreach ( $files as $file ) {
 		}
 	}
 
-	// get_page_by_path() doesn't reliably match drafts, which is what these
-	// posts are - a direct query by post_name does.
+	// get_page_by_path() doesn't reliably match drafts, and post_status =>
+	// 'any' silently excludes drafts too ('draft' is registered with
+	// exclude_from_search, which is what 'any' actually filters on) - an
+	// explicit status list is the only way to really match everything.
 	$matches = get_posts( [
 		'name'           => $slug,
 		'post_type'      => 'post',
-		'post_status'    => 'any',
+		'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
 		'posts_per_page' => 1,
 	] );
 	$existing = $matches ? $matches[0] : null;
