@@ -5,15 +5,42 @@ on:
     branches: [master]
     paths:
       - 'docs/**'
+      - '.github/scripts/sync-docs.php'
   workflow_dispatch: {}
+
+env:
+  SSH_HOST: ssh.salesbystate.com
+  SSH_PORT: 18765
+  SSH_USER: u567-drj4rf5c7qzt
+  REMOTE_WP_PATH: /home/u567-drj4rf5c7qzt/www/salesbystate.com/public_html
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: node .github/scripts/sync-docs.mjs
-        env:
-          WP_URL: ${{ secrets.WP_URL }}
-          WP_USER: ${{ secrets.WP_USER }}
-          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Copy docs and sync script to server
+        run: |
+          REMOTE_TMP="/tmp/sbs-docs-sync-${{ github.run_id }}"
+          ssh -p "$SSH_PORT" -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" "mkdir -p $REMOTE_TMP"
+          scp -P "$SSH_PORT" -i ~/.ssh/deploy_key -r docs "$SSH_USER@$SSH_HOST:$REMOTE_TMP/docs"
+          scp -P "$SSH_PORT" -i ~/.ssh/deploy_key .github/scripts/sync-docs.php "$SSH_USER@$SSH_HOST:$REMOTE_TMP/sync-docs.php"
+          echo "REMOTE_TMP=$REMOTE_TMP" >> "$GITHUB_ENV"
+
+      - name: Run sync on the server
+        run: |
+          ssh -p "$SSH_PORT" -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" \
+            "cd $REMOTE_WP_PATH && wp eval-file $REMOTE_TMP/sync-docs.php && (wp sg purge >/dev/null 2>&1 || true)"
+
+      - name: Clean up remote temp files
+        if: always()
+        run: |
+          ssh -p "$SSH_PORT" -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" "rm -rf $REMOTE_TMP"
