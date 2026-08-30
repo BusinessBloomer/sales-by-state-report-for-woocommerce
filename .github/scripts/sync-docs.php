@@ -101,7 +101,15 @@ foreach ( $files as $file ) {
 		}
 	}
 
-	$existing = get_page_by_path( $slug, OBJECT, 'post' );
+	// get_page_by_path() doesn't reliably match drafts, which is what these
+	// posts are - a direct query by post_name does.
+	$matches = get_posts( [
+		'name'           => $slug,
+		'post_type'      => 'post',
+		'post_status'    => 'any',
+		'posts_per_page' => 1,
+	] );
+	$existing = $matches ? $matches[0] : null;
 
 	$postarr = [
 		'post_title'    => $title,
