@@ -26,6 +26,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "--- key file structure (non-sensitive) ---"
+          wc -l ~/.ssh/deploy_key
+          head -c 40 ~/.ssh/deploy_key
+          echo
+          tail -c 40 ~/.ssh/deploy_key
+          echo
+          ssh-keygen -l -f ~/.ssh/deploy_key || echo "ssh-keygen could not read this as a key"
 
       - name: Copy docs and sync script to server
         run: |
