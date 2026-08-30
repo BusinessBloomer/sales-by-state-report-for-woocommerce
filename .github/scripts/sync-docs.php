@@ -93,6 +93,19 @@ foreach ( $files as $file ) {
 	$md = file_get_contents( $docs_dir . '/' . $file );
 	list( $title, $content, $screenshot_file ) = sbsdocs_md_to_blocks( $md );
 
+	// get_page_by_path() doesn't reliably match drafts, and post_status =>
+	// 'any' silently excludes drafts too ('draft' is registered with
+	// exclude_from_search, which is what 'any' actually filters on) - an
+	// explicit status list is the only way to really match everything.
+	$matches = get_posts( [
+		'name'           => $slug,
+		'post_type'      => 'post',
+		'post_status'    => [ 'publish', 'draft', 'pending', 'future', 'private' ],
+		'posts_per_page' => 1,
+	] );
+	$existing = $matches ? $matches[0] : null;
+	$old_thumb_id = $existing ? get_post_thumbnail_id( $existing->ID ) : null;
+
 	$attach_id = null;
 	if ( $screenshot_file ) {
 		$image_path = $shots_dir . '/' . $screenshot_file;
@@ -100,8 +113,6 @@ foreach ( $files as $file ) {
 			$attach_id = sbsdocs_upload_image( $image_path, $title . ' screenshot' );
 		}
 	}
-
-	$existing = get_page_by_path( $slug, OBJECT, 'post' );
 
 	$postarr = [
 		'post_title'    => $title,
@@ -123,6 +134,11 @@ foreach ( $files as $file ) {
 
 	if ( $attach_id && ! is_wp_error( $post_id ) ) {
 		set_post_thumbnail( $post_id, $attach_id );
+		// Replacing the featured image, not stacking another one - the old
+		// attachment has no other use once a new screenshot takes its place.
+		if ( $old_thumb_id && $old_thumb_id != $attach_id ) {
+			wp_delete_attachment( $old_thumb_id, true );
+		}
 	}
 }
 
