@@ -2,3 +2,5 @@
 .gitignore export-ignore
 /.github export-ignore
 phpcs.xml.dist export-ignore
+docs.md export-ignore
+/docs export-ignore
