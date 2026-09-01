@@ -1,4 +1,8 @@
 *** Sales by State Report for WooCommerce Changelog ***
 
+2026-09-01 - version 1.0.1
+* Tested up to WordPress 7.1.
+* Excluded doc-sync source files from the WP.org package.
+
 2026-08-14 - version 1.0.0
 * Initial release.
